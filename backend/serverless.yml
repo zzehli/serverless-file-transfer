@@ -20,10 +20,16 @@ service: fileshare-backend
 # Check out our docs for more details
 frameworkVersion: '3'
 
+plugins:
+- serverless-iam-roles-per-function
+
 provider:
   name: aws
   runtime: nodejs16.x
   region: us-east-2
+  environment:
+    BUCKET_NAME: !Ref FileBucket
+#https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html
 
 # you can overwrite defaults here
 #  stage: dev
@@ -59,9 +65,26 @@ provider:
 #    - include-me.js
 #    - include-me-dir/**
 
+# https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html
 functions:
-  hello:
-    handler: handler.hello
+  startShare:
+    handler: share-handler.handle_event
+    events:
+      - httpApi:
+          method: POST
+          path: '/'
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:GetObject
+          - s3:PutObject
+        Resource:
+          - !Sub "arn:aws:s3:::${FileBucket}/shares/*"
+      - Effect: Allow
+        Action:
+          - s3:ListBucket
+        Resource:
+          - !Sub "arn:aws:s3:::${FileBucket}"
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
