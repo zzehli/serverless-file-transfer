@@ -68,7 +68,7 @@ provider:
 # https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html
 functions:
   startShare:
-    handler: share-handler.handle_event
+    handler: share-handler.handleEvent
     events:
       - httpApi:
           method: POST
