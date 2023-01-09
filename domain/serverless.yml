@@ -1,0 +1,45 @@
+service: domain
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: us-east-2
+  stage: dev
+
+plugins:
+  - serverless-iam-roles-per-function
+
+custom:
+  domainName: linktransfer.click
+
+resources:
+  Resources:
+    PublicHostedZone:
+      Type: AWS::Route53::HostedZone
+      Properties:
+        Name: ${self:custom.domainName}
+
+    DomainCert:
+        Type: AWS::CertificateManager::Certificate
+        Properties:
+          DomainName: ${self:custom.domainName}
+          ValidationMethod: DNS
+          DomainValidationOptions:
+            - DomainName: ${self:custom.domainName}
+              HostedZoneId: !Ref PublicHostedZone
+
+  Outputs:
+    PublicHostedZone:
+      Description: HostedZone for the domain
+      Value: !Ref PublicHostedZone
+      Export:
+        Name: public-hosted-zone-${sls:stage}
+
+    DomainCertArn:
+          Description: ARN of the domain root certificate
+          Value: !Ref DomainCert
+          Export:
+            Name: domain-cert-${sls:stage}
+      
