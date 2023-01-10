@@ -29,6 +29,7 @@ provider:
   region: us-east-2
   environment:
     BUCKET_NAME: !Ref FileBucket
+    BASE_URL: https://${self:custom.domainName}
 #https://docs.aws.amazon.com/AWSC
 
 custom:
@@ -45,7 +46,6 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - s3:GetObject
           - s3:PutObject
         Resource:
           - !Sub "arn:aws:s3:::${FileBucket}/shares/*"
@@ -54,6 +54,18 @@ functions:
           - s3:ListBucket
         Resource:
           - !Sub "arn:aws:s3:::${FileBucket}"
+  downloadShare:
+    handler: download-handler.handleEvent
+    events:
+      - httpApi:
+          method: GET
+          path: '/{id}'
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:GetObject
+        Resource:
+          - !Sub "arn:aws:s3:::${FileBucket}/shares/*"
 
 resources:
  Resources:
