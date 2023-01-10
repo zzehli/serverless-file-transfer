@@ -13,7 +13,7 @@ export const handleEvent = async (event, context) => {
     const id = event.pathParameters.id
 
     //create a presigned URL for that file
-    const key = `shares/${id[0]}/$id{id[1]}/${id}`
+    const key = `shares/${id[0]}/${id[1]}/${id}`
     
     //create the download URL
     const getCommand = new GetObjectCommand({
