@@ -68,7 +68,9 @@ Download with: curl -L -o ${filename} ${downloadUrl}
   if (event.preferredMediaType === 'application/json') {
     body = JSON.stringify({
       filename,
-      headers: [contentDispositionHeader],
+      headers: {
+        'content-disposition': contentDisposition
+      },
       downloadUrl,
       uploadUrl 
     })
