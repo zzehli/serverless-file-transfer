@@ -5,6 +5,8 @@ import { Metrics, logMetrics, MetricUnits } from '@aws-lambda-powertools/metrics
 import { Tracer, captureLambdaHandler } from '@aws-lambda-powertools/tracer';
 import { Logger, injectLambdaContext } from '@aws-lambda-powertools/logger';
 import middy from '@middy/core';
+import httpContentNegotiation from '@middy/http-content-negotiation';
+import httpHeaderNormalizer from '@middy/http-header-normalizer';
 
 const { BUCKET_NAME, BASE_URL } = process.env;
 const EXPIRY_DEFAULT = 24 * 60 * 60;
@@ -57,13 +59,25 @@ async function handler (event, context) {
     signableHeaders
   }
   )
-
+  let headers = { 'content-type': 'text/plain' };
+  let body = 
+`Upload with: curl -X PUT -T ${filename || `<FILENAME>`} ${contentDispositionHeader ? `-H '${contentDispositionHeader}'`: ''} '${uploadUrl}'
+Download with: curl -L -o ${filename} ${downloadUrl}
+`;
+  //have the option to return JSON response for easy parsing
+  if (event.preferredMediaType === 'application/json') {
+    body = JSON.stringify({
+      filename,
+      headers: [contentDispositionHeader],
+      downloadUrl,
+      uploadUrl 
+    })
+    headers ={ 'content-type': 'application/json' }
+  }
   return {
     statusCode: 201,
-    body:
-`Upload with: curl -X PUT -T ${filename || `<FILENAME>`} ${contentDispositionHeader ? `-H '${contentDispositionHeader}'`: ''} '${uploadUrl}'
-Download with: curl ${downloadUrl} --output '${filename}'
-`
+    headers,
+    body
   }
 }
 
@@ -72,3 +86,11 @@ export const handleEvent = middy(handler)
   .use(injectLambdaContext(logger, { logEvent: true }))
   .use(logMetrics(metrics))
   .use(captureLambdaHandler(tracer))
+  .use(httpHeaderNormalizer())
+  .use(httpContentNegotiation({
+    parseCharsets: false,
+    parseEncodings: false,
+    parseLanguages: false,
+    failOnMismatch: false,
+    availableMediaTypes: ['text/plain', 'application/json']
+  }))
