@@ -27,10 +27,14 @@ provider:
   name: aws
   runtime: nodejs16.x
   region: us-east-2
+  tracing:
+    apiGateway: true
+    lambda: true
   environment:
     BUCKET_NAME: !Ref FileBucket
     BASE_URL: https://${self:custom.domainName}
-#https://docs.aws.amazon.com/AWSC
+    POWERTOOLS_SERVICE_NAME: linktransfer
+    POWERTOOLS_METRICS_NAMESPACE: linktransfer
 
 custom:
   domainName: linktransfer.click
