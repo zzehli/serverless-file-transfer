@@ -8,7 +8,7 @@ Recorded demo: https://youtu.be/zjTOr3mA_o8
 * Secure and scalable object storage through S3
 * Streamlined service provision and deployment with Serverless Framework
 * Access through a custom domain that connects to API Gateway
-* Observability features implemented with AWS power tools
+* Observability best practices implemented with AWS Power Tools
 
 The architecture diagram of the application is shown below:
 ![arch-diagram](./AWS-arch-diagram.png)
