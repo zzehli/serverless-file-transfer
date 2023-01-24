@@ -1,7 +1,7 @@
 # Link Transfer
 Link Transfer is a cloud-based file-sharing application built on top of AWS services. It is a secure and privacy-centered alternative to services like Wetransfer and Dropbox.
 
-Recorded demo: https://youtu.be/zjTOr3mA_o8
+Recorded demo: https://youtu.be/3m3O2sOvaug
 
 ## Features
 * Convenient upload through custom-built CLI interface
